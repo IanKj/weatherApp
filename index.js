@@ -4,6 +4,7 @@ const searchButton = document.querySelector('#searchBtn')
 async function getWeather(cityName) {
     try {
         const resp = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName},us&units=imperial&appid=f61aea896ee8f387a5e6519e80d4f0b2`)
+
         if (resp.ok) {
             const data = await resp.json()
             console.log(data)
@@ -45,7 +46,7 @@ function getDate(num) {
 
 async function getImage(query) {
     try {
-        const resp = await fetch(`https://api.giphy.com/v1/gifs/translate?api_key=ygNDtvwKTze1STUBZztFasjhbmAOdU8d&s=${query}`, { mode: 'cors' })
+        const resp = await fetch(`https://api.giphy.com/v1/gifs/translate?api_key=ygNDtvwKTze1STUBZztFasjhbmAOdU8d&s=${query}+weather`, { mode: 'cors' })
         const imgData = await resp.json()
         console.log(imgData)
         gifImg.src = imgData.data.images.original.url
@@ -93,17 +94,23 @@ async function displayWeather(city) {
     getImage(weatherData.weatherDescription)
     populateWeatherInfo(weatherData)
     console.log(weatherData)
+    //remove loader animation
+    searchButton.classList.remove('searching')
 }
 
 
 searchButton.addEventListener('click', function () {
     const searchInput = document.querySelector('.searchField input')
     const searchVal = searchInput.value
+
+    //add loading animation
+    searchButton.classList.add('searching')
     clearData()
     displayWeather(searchVal).catch((error) => {
         console.log(error.name, error.message)
         handleError(error)
     })
+
 
 })
 function handleError(error) {
@@ -117,8 +124,8 @@ function handleError(error) {
         weatherInfo.append(message)
 
         //edit css
-        weatherInfo.classList.remove(...weatherInfo.classList)
         weatherInfo.classList.add('error')
+        searchButton.classList.remove('searching')
     }
 }
 function clearData() {
@@ -131,3 +138,5 @@ displayWeather('Fairbanks')
 
 //check for error with search entry
 //if no match => clear data fields => populate with error code and message...unable to find that city, try again
+
+//todo => remove error box on new search => 404 gif on error => styles => reorganize card layout => change to celcius => 
