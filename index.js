@@ -1,5 +1,6 @@
 const gifImg = document.querySelector('img')
 const searchButton = document.querySelector('#searchBtn')
+let isFahrenheit = true
 
 async function getWeather(cityName) {
     try {
@@ -60,7 +61,7 @@ async function getImage(query) {
 
 async function populateWeatherInfo(weatherData) {
     console.log(weatherData)
-    const { humidity, location, sunrise, sunset, temperature, weatherDescription, windSpeed } = weatherData
+    let { humidity, location, sunrise, sunset, temperature, weatherDescription, windSpeed } = weatherData
 
     const infoContainer = document.querySelector('.weatherInfo')
     const header = document.createElement('h3')
@@ -84,7 +85,25 @@ async function populateWeatherInfo(weatherData) {
     const sunsetDOM = document.createElement('p')
     sunsetDOM.innerText = `Sunset: ${sunset}`
 
+    const celciusButton = document.createElement('button')
+    celciusButton.innerText = "swap to C"
+    celciusButton.classList.add('button')
 
+
+    celciusButton.addEventListener('click', function () {
+        swapTemperature(temperature, isFahrenheit, temperatureDOM)
+        temperature = swapTemperature(temperature, isFahrenheit, temperatureDOM)
+        isFahrenheit = !isFahrenheit
+        if (isFahrenheit) {
+            celciusButton.innerText = 'swap to C'
+        } else {
+            celciusButton.innerText = 'swap to F'
+        }
+        temperatureDOM.append(celciusButton)
+
+    })
+
+    temperatureDOM.append(celciusButton)
     infoContainer.append(weatherDescriptionDOM, temperatureDOM, humidityDOM, windSpeedDOM, sunriseDOM, sunsetDOM)
 }
 
@@ -98,11 +117,25 @@ async function displayWeather(city) {
     searchButton.classList.remove('searching')
 }
 
+function swapTemperature(temperature, isFahrenheit, targetEl) {
+    let temp = temperature
+
+    if (isFahrenheit) {
+        let FtoC = ((temp - 32) * (5 / 9)).toFixed(2)
+        temp = `${FtoC}\u00B0 C`
+    }
+    else {
+        let CtoF = ((temp * 1.8) + 32).toFixed(1)
+        temp = `${CtoF}\u00B0 F`
+    }
+    targetEl.innerText = temp
+    return parseFloat(temp)
+}
 
 searchButton.addEventListener('click', function () {
     const searchInput = document.querySelector('.searchField input')
     const searchVal = searchInput.value
-
+    isFahrenheit = true
     //add loading animation
     searchButton.classList.add('searching')
     clearData()
